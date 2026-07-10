@@ -9,7 +9,7 @@ resource "aws_ecs_cluster" "main" {
 }
 
 resource "aws_ecs_cluster_capacity_providers" "main" {
-  cluster_name = aws_ecs_cluster.main.name
+  cluster_name       = aws_ecs_cluster.main.name
   capacity_providers = ["FARGATE", "FARGATE_SPOT"]
 
   default_capacity_provider_strategy {
@@ -20,7 +20,7 @@ resource "aws_ecs_cluster_capacity_providers" "main" {
 
 resource "aws_cloudwatch_log_group" "app" {
   name              = "/ecs/altair-blog"
-  retention_in_days = 30
+  retention_in_days = 365
   tags              = { Name = "altair-blog" }
 }
 
@@ -43,14 +43,14 @@ resource "aws_ecs_task_definition" "app" {
       ]
       environment = [
         { name = "DJANGO_SETTINGS_MODULE", value = "blog.settings" },
-        { name = "ALLOWED_HOSTS",           value = "*" },
-        { name = "DJANGO_DEBUG",           value = "False" },
+        { name = "ALLOWED_HOSTS", value = "*" },
+        { name = "DJANGO_DEBUG", value = "False" },
       ]
       secrets = [
-        { name = "DB_HOST",     valueFrom = "${aws_secretsmanager_secret.db.arn}:host::" },
-        { name = "DB_PORT",     valueFrom = "${aws_secretsmanager_secret.db.arn}:port::" },
-        { name = "DB_NAME",     valueFrom = "${aws_secretsmanager_secret.db.arn}:db_name::" },
-        { name = "DB_USER",     valueFrom = "${aws_secretsmanager_secret.db.arn}:username::" },
+        { name = "DB_HOST", valueFrom = "${aws_secretsmanager_secret.db.arn}:host::" },
+        { name = "DB_PORT", valueFrom = "${aws_secretsmanager_secret.db.arn}:port::" },
+        { name = "DB_NAME", valueFrom = "${aws_secretsmanager_secret.db.arn}:db_name::" },
+        { name = "DB_USER", valueFrom = "${aws_secretsmanager_secret.db.arn}:username::" },
         { name = "DB_PASSWORD", valueFrom = "${aws_secretsmanager_secret.db.arn}:password::" },
       ]
       logConfiguration = {
@@ -67,15 +67,21 @@ resource "aws_ecs_task_definition" "app" {
 }
 
 resource "aws_ecs_service" "app" {
-  name            = "altair-blog"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.app.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
+  name                   = "altair-blog"
+  cluster                = aws_ecs_cluster.main.id
+  task_definition        = aws_ecs_task_definition.app.arn
+  desired_count          = 1
+  launch_type            = "FARGATE"
+  enable_execute_command = true
+
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
 
   network_configuration {
-    subnets         = aws_subnet.private[*].id
-    security_groups = [aws_security_group.ecs.id]
+    subnets          = aws_subnet.private[*].id
+    security_groups  = [aws_security_group.ecs.id]
     assign_public_ip = false
   }
 
