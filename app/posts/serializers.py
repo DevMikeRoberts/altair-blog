@@ -27,8 +27,8 @@ class PostDetailSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ["id", "post", "author_name", "content", "created_at"]
-        read_only_fields = ["approved"]
+        fields = ["id", "post", "author_name", "author_email", "content", "created_at"]
+        read_only_fields = ["approved", "post"]
 
     def create(self, validated_data):
         validated_data["approved"] = False

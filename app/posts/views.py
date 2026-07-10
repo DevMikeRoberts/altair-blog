@@ -21,7 +21,7 @@ class PostDetailView(generics.RetrieveAPIView):
 
 
 class CategoryListView(generics.ListAPIView):
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by("name")
     serializer_class = CategorySerializer
 
 
