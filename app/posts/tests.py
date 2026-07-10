@@ -28,7 +28,7 @@ class PostModelTest(TestCase):
             published=True,
         )
         posts = Post.objects.filter(published=True)
-        self.assertEqual(posts.first(), self.post)
+        self.assertEqual(posts.first(), post2)
 
     def test_category_str(self):
         self.assertEqual(str(self.category), "Tech")
@@ -84,12 +84,12 @@ class PostAPITest(TestCase):
     def test_list_categories(self):
         resp = self.client.get("/api/categories/")
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(len(resp.data), 1)
+        self.assertEqual(resp.data["count"], 1)
 
     def test_create_comment(self):
         resp = self.client.post(
             f"/api/posts/{self.post.slug}/comments/",
-            {"author_name": "Bob", "content": "Nice!"},
+            {"author_name": "Bob", "author_email": "bob@example.com", "content": "Nice!"},
             format="json",
         )
         self.assertEqual(resp.status_code, 201)
