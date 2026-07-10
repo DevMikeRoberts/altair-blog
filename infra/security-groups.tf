@@ -70,21 +70,5 @@ resource "aws_security_group" "rds" {
 resource "aws_default_security_group" "default" {
   vpc_id = aws_vpc.main.id
 
-  ingress {
-    description = "Deny all inbound"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = []
-  }
-
-  egress {
-    description = "Deny all outbound"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = []
-  }
-
   tags = { Name = "altair-default-sg" }
 }
