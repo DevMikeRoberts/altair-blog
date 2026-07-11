@@ -29,4 +29,8 @@ python manage.py test
 python manage.py runserver
 ```
 
+## Architecture
+
+![altair-blog architecture](docs/architecture.png)
+
 See `docs/DEVELOPMENT.md` for full setup instructions.
